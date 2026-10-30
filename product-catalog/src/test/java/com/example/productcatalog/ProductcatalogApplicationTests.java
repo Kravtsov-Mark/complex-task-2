@@ -1,27 +1,25 @@
 name: Java CI
 on:
-push:
-branches: [ "main" ]
-pull_request:
-branches: [ "main" ]
+	push:
+        branches: [ "main" ]
+    pull_request:
+        branches: [ "main" ]
 jobs:
-build:
-runs-on: ubuntu-latest
-steps:
-		- name: Checkout repository
-uses: actions/checkout@v4
+    build:
+        runs-on: ubuntu-latest
+        steps:
+		    - name: Checkout repository
+            uses: actions/checkout@v4
 
-    - name: Set up JDK 17
-uses: actions/setup-java@v5
-with:
-java-version: '17'
-distribution: 'temurin'
-cache: gradle
+            - name: Set up JDK 17
+            uses: actions/setup-java@v5
+            with:
+                java-version: '17'
+                distribution: 'temurin'
+                cache: gradle
 
-    - name: Grant execute permission for gradlew
-run: chmod +x product-catalog/gradlew
+            - name: Grant execute permission for gradlew
+            run: chmod +x product-catalog/gradlew
 
-    - name: Build and test with Gradle
-run: cd product-catalog && ./gradlew build
-
-
+            - name: Build and test with Gradle
+            run: cd product-catalog && ./gradlew build
