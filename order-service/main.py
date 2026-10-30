@@ -7,9 +7,9 @@ from datetime import date, timedelta
 
 PRODUCT_SERVICE_URL = "http://localhost:8080/products"
 
-# СF6BD9AAO 9>79@C?ODG FastAPI
+
 app = FastAPI()
-# --- МB89?і 8аA8х 7а 8BCB@B7BN Pydantic ---
+
 class OrderItem(BaseModel):
     product_id: int
     quantity: int
@@ -19,17 +19,14 @@ class Order(BaseModel):
     total_amount: float = 0.0
     deliveryDate: str
 
-# --- СхBв8ще в Cа@'яFі ---
 orders: Dict[int, Order] = {}
 #order_id_counter = threading.local()
 order_id_counter = 0
 
-# GET /orders - BFD8@аF8 вEі 7а@Bв?еAAя
 @app.get("/orders", response_model=List[Order])
 def get_all_orders():
     return list(orders.values())
 
-# GET /orders/{order_id} - BFD8@аF8 7а@Bв?еAAя 7а ID
 @app.get("/orders/{order_id}", response_model=Order)
 def get_order_by_id(order_id: int):
     if order_id not in orders:
@@ -55,7 +52,7 @@ def create_order(order_items: List[OrderItem]):
                 validated_items.append(item)
             elif response.status_code == 404:
                 raise HTTPException(
-                    status_code=status.HTTP_404_BAD_REQUEST,
+                    status_code=status.HTTP_400_BAD_REQUEST,
                     detail=f"Product with id {item.product_id} not found."
                 )
             else:
