@@ -1,0 +1,8 @@
+Plaintext
+fastapi
+uvicorn
+pydantic
+requests
+pytest
+httpx
+requests-mock
