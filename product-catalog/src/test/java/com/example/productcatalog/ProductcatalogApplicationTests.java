@@ -1,25 +1,12 @@
-name: Java CI
-on:
-	push:
-        branches: [ "main" ]
-    pull_request:
-        branches: [ "main" ]
-jobs:
-    build:
-        runs-on: ubuntu-latest
-        steps:
-		    - name: Checkout repository
-            uses: actions/checkout@v4
+package com.example.productcatalog;
 
-            - name: Set up JDK 17
-            uses: actions/setup-java@v5
-            with:
-                java-version: '17'
-                distribution: 'temurin'
-                cache: gradle
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 
-            - name: Grant execute permission for gradlew
-            run: chmod +x product-catalog/gradlew
+@SpringBootTest
+class ProductcatalogApplicationTests {
 
-            - name: Build and test with Gradle
-            run: cd product-catalog && ./gradlew build
+    @Test
+    void contextLoads() {
+    }
+}
