@@ -1,72 +1,52 @@
 package com.example.productcatalog;
 
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
 
 @RestController
 @RequestMapping("/products")
 public class ProductController {
 
-    private final Map<Long, Product> products = new ConcurrentHashMap<>();
-    private final AtomicLong counter = new AtomicLong();
+    @Autowired
+    private ProductRepository productRepository;
 
-    public ProductController() {
-        // Початкові дані для демонстрації
-        products.put(counter.incrementAndGet(), new Product(1L, "Laptop", 1200.50));
-        products.put(counter.incrementAndGet(), new Product(2L, "Smartphone", 800.00));
-    }
-
-    // GET /products - отримати всі продукти
     @GetMapping
     public List<Product> getAllProducts() {
-        return new ArrayList<>(products.values());
+        return productRepository.findAll();
     }
 
-    // GET /products/{id} - отримати продукт за ID
-    @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable long id) {
-        Product product = products.get(id);
-        if (product!= null) {
-            return ResponseEntity.ok(product);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    // POST /products - створити новий продукт
     @PostMapping
-    public ResponseEntity<Product> createProduct(@RequestBody Product product) {
-        long newId = counter.incrementAndGet();
-        product.setId(newId);
-        products.put(newId, product);
-        return new ResponseEntity<>(product, HttpStatus.CREATED);
+    public Product createProduct(@RequestBody Product product) {
+        return productRepository.save(product);
     }
 
-    // PUT /products/{id} - оновити існуючий продукт
+    @GetMapping("/{id}")
+    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
+        return productRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable long id, @RequestBody Product updatedProduct) {
-        if (!products.containsKey(id)) {
-            return ResponseEntity.notFound().build();
-        }
-        updatedProduct.setId(id);
-        products.put(id, updatedProduct);
-        return ResponseEntity.ok(updatedProduct);
+    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product productDetails) {
+        return productRepository.findById(id)
+                .map(product -> {
+                    product.setName(productDetails.getName());
+                    product.setPrice(productDetails.getPrice());
+                    return ResponseEntity.ok(productRepository.save(product));
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    // DELETE /products/{id} - видалити продукт
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable long id) {
-        if (products.remove(id) == null) {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+        if (productRepository.existsById(id)) {
+            productRepository.deleteById(id);
+            return ResponseEntity.ok().build();
         }
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.notFound().build();
     }
 }
-
